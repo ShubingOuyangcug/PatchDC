@@ -9,7 +9,7 @@ Figure2 true early warning sample
 
 <img width="4419" height="4069" alt="3" src="https://github.com/user-attachments/assets/4fc72fc1-5202-4a4c-a834-585d1fef363a" />
 
-Figure3 the propose model
+Figure3 the proposed model
 
 To ensure optimal performance for each fold, Bayesian hyperparameter optimization was independently conducted for every fold using the training data. The optimization utilized the Optuna 3 framework with the Tree-structured Parzen Estimator (TPE) as the sampler.  
 For your convenience, I've integrated all the code into train1.py so you can run it directly
