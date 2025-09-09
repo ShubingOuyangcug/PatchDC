@@ -1363,7 +1363,63 @@ class RecallConditionalModelCheckpoint(pl.Callback):
             self.best_model_path = best_candidate_path
             print(f"💾 保存最佳模型到: {best_candidate_path}")
 
-
+            # # 验证模型加载功能
+            # try:
+            #     # 注意这里不能直接使用RainfallModel.load_from_checkpoint
+            #     # 因为加载需要初始化模型参数
+            #     checkpoint = torch.load(best_candidate_path)
+            #     state_dict = checkpoint['state_dict']
+            #     # 创建模型实例并加载状态
+            #     model = deepcopy(pl_module)
+            #     model.load_state_dict(state_dict)
+            #     model.to(device)
+            #     model.eval()
+            #     print("cc:", self.best_model_path)
+            #
+            #     # 创建测试数据集
+            #     val_dataset = CSVDataset(self.val_mapping)
+            #     print("val_dataset", len(val_dataset))
+            #     val_loader = DataLoader(
+            #         val_dataset,
+            #         batch_size=40,
+            #         shuffle=False,
+            #         num_workers=4,
+            #         collate_fn=collate_fn,
+            #         persistent_workers=True,
+            #         pin_memory=True
+            #     )
+            #
+            #     # 评估模型在验证集上的表现
+            #     all_labels = []
+            #     all_preds = []
+            #
+            #     with torch.no_grad():
+            #         for batch in val_loader:
+            #             if batch is None:
+            #                 continue
+            #
+            #             inputs = {k: v.to(device) for k, v in batch.items() if k != 'labels'}
+            #             labels = batch['labels'].to(device)
+            #
+            #             outputs = model(inputs)
+            #             _, preds = torch.max(outputs, 1)
+            #
+            #             all_labels.extend(labels.cpu().numpy())
+            #             all_preds.extend(preds.cpu().numpy())
+            #
+            #     # 计算验证集上的评估指标
+            #     precision_1 = precision_score(all_labels, all_preds, pos_label=1, zero_division=0)
+            #     recall_1 = recall_score(all_labels, all_preds, pos_label=1, zero_division=0)
+            #     f11 = f1_score(all_labels, all_preds, pos_label=1, zero_division=0)
+            #     f1 = f1_score(all_labels, all_preds, average='macro', zero_division=0)
+            #     ac = accuracy_score(all_labels, all_preds)
+            #     print(f"验证集cc：f1: {f1},精确度：{precision_1:.4f}，召回率: {recall_1:.4f}，F1_1分数: {f11:.4f}")
+            #     print("✅ 模型状态加载验证成功")
+            # except Exception as e:
+            #     print(f"⚠️ 模型状态加载失败: {e}")
+            #
+            #
+            #
 
     def on_train_end(self, trainer, pl_module):
         """训练结束时总结最佳模型"""
@@ -1421,7 +1477,7 @@ def objective(trial, train_mapping, val_mapping, test_mapping, fold_idx, save_di
 
     # 自定义回调函数 - 在满足召回率条件下选择F1最高的模型
     recall_checkpoint = RecallConditionalModelCheckpoint(
-        recall_threshold=0.8,
+
         val_mapping=val_mapping,
     save_dir = checkpoint_dir
     )
@@ -1432,8 +1488,8 @@ def objective(trial, train_mapping, val_mapping, test_mapping, fold_idx, save_di
         min_delta=0.001,
         patience=40,
         verbose=True,
-        mode='max',
-        stopping_threshold=0.95
+        mode='max'
+
     )
     model_checkpoint = ModelCheckpoint(
         dirpath=checkpoint_dir,
